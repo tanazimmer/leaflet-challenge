@@ -1,70 +1,110 @@
 # Leaflet Homework - Visualizing Data with Leaflet
 
-## Background
+## Javascript, HTML, CSS
 
-![1-Logo](Images/1-Logo.png)
+### Challenge: The United States Geological Survey (USGS) is responsible for providing scientific data about natural hazards, the health of our ecosystems and environment; and the impacts of climate and land-use change. Their scientists develop new methods and tools to supply timely, relevant, and useful information about the Earth and its processes.  Visualize earthquake data using the USGS datasets
 
-Welcome to the United States Geological Survey, or USGS for short! The USGS is responsible for providing scientific data about natural hazards, the health of our ecosystems and environment; and the impacts of climate and land-use change. Their scientists develop new methods and tools to supply timely, relevant, and useful information about the Earth and its processes. As a new hire, you will be helping them out with an exciting new project!
+* Get the data
+```
+// Perform a GET request to the query URL
+d3.json(queryUrl, function(data) {
+  function styleInfo(feature) {
+    return {
+      fillOpacity: 3,
+      fillColor: getColor(feature.properties.mag),
+      color: "#000000",
+      radius: getRadius(feature.properties.mag),
+      stroke: true,
+      weight: 1
+    };
+  }
+```
 
-The USGS is interested in building a new set of tools that will allow them visualize their earthquake data. They collect a massive amount of data from all over the world each day, but they lack a meaningful way of displaying it. Their hope is that being able to visualize their data will allow them to better educate the public and other government organizations (and hopefully secure more funding..) on issues facing our planet.
+* Import & Visualize the Data
+```
+    // GeoJSON layer
+    L.geoJson(data, {
+      // Maken cricles
+      pointToLayer: function(feature, latlng) {
+        return L.circleMarker(latlng);
+      },
+      // cirecle style
+      style: styleInfo,
+      // popup for each marker
+      onEachFeature: function(feature, layer) {
+        layer.bindPopup("Magnitude: " + feature.properties.mag + "<br><br>Location: " + feature.properties.place);
+      }
+    }).addTo(myMap);
+  
+```
 
-### Before You Begin
 
-1. Create a new repository for this project called `leaflet-challenge`. **Do not add this homework to an existing repository**.
+   * Data markers should reflect the magnitude of the earthquake by their size and and depth of the earth quake by color. 
+```
+  // set different color from magnitude
+    function getColor(magnitude) {
+    switch (true) {
+    case magnitude > 5:
+      return "red";
+    case magnitude > 4:
+      return "orangered";
+    case magnitude > 3:
+      return "darkorange";
+    case magnitude > 2:
+      return "orange";
+    case magnitude > 1:
+      return "gold";
+    default:
+      return "yellow";
+    }
+  }
+  // set radiuss from magnitude
+    function getRadius(magnitude) {
+    if (magnitude === 0) {
+      return 1;
+    }
 
-2. Clone the new repository to your computer.
-
-3. Inside your local git repository, create a directory for the Leaflet challenge. Use the folder names to correspond to the challenges: **Leaflet-Step-1** and **Leaflet-Step-2**.
-
-4. This homeworks utilizes both **html** and **Javascript** so be sure to add all the necessary files. These will be the main files to run for analysis.
-
-5. Push the above changes to GitHub or GitLab.
-
-## Your Task
-
-### Level 1: Basic Visualization
-
-![2-BasicMap](Images/2-BasicMap.png)
-
-Your first task is to visualize an earthquake data set.
-
-1. **Get your data set**
-
-   ![3-Data](Images/3-Data.png)
-
-   The USGS provides earthquake data in a number of different formats, updated every 5 minutes. Visit the [USGS GeoJSON Feed](http://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php) page and pick a data set to visualize. When you click on a data set, for example 'All Earthquakes from the Past 7 Days', you will be given a JSON representation of that data. You will be using the URL of this JSON to pull in the data for our visualization.
-
-   ![4-JSON](Images/4-JSON.png)
-
-2. **Import & Visualize the Data**
-
-   Create a map using Leaflet that plots all of the earthquakes from your data set based on their longitude and latitude.
-
-   * Your data markers should reflect the magnitude of the earthquake by their size and and depth of the earth quake by color. Earthquakes with higher magnitudes should appear larger and earthquakes with greater depth should appear darker in color.
-
-   * **HINT** the depth of the earth can be found as the third coordinate for each earthquake.
-
+    return magnitude * 5;
+  }
+    // GeoJSON layer
+    L.geoJson(data, {
+      // Maken cricles
+      pointToLayer: function(feature, latlng) {
+        return L.circleMarker(latlng);
+      },
+```
    * Include popups that provide additional information about the earthquake when a marker is clicked.
-
+```
+      // circle style
+      style: styleInfo,
+      // popup for each marker
+      onEachFeature: function(feature, layer) {
+        layer.bindPopup("Magnitude: " + feature.properties.mag + "<br><br>Location: " + feature.properties.place);
+      }
+```
    * Create a legend that will provide context for your map data.
+```
+// legend
+    legend.onAdd = function() {
+      var div = L.DomUtil.create("div", "info legend");
+  
+      var grades = [0, 1, 2, 3, 4, 5];
+      var colors = [
+        "yellow",
+        "gold",
+        "orange",
+        "darkorange",
+        "orangered",
+        "red"
+      ];
+      
+      // Looping through
+      for (var i = 0; i < grades.length; i++) {
+        div.innerHTML +=
+          "<i style='background: " + colors[i] + "'></i> " +
+          grades[i] + (grades[i + 1] ? "&ndash;" + grades[i + 1] + "<br>" : "+");
+      }
+      return div;
+    };
+```
 
-   * Your visualization should look something like the map above.
-
-- - -
-### Assessment
-
-Your final product will be assessed on the following metrics:
-
-* Completion of assigned tasks
-
-* Visual appearance
-
-* Professionalism
-
-* Ensure your repository has regular commits (i.e. 20+ commits) and a thorough README.md file
-
-**Good luck!**
-
-### Copyright
-
-Trilogy Education Services © 2019. All Rights Reserved.
